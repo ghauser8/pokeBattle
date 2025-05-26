@@ -1,14 +1,13 @@
 import random
 
-class Animal:
-    def __init__(self, name, hp, attack1_name, attack1_dmg, attack2_name, attack2_dmg):
-        self.name = name
-        self.hp = hp
-        self.max_hp = hp
-        self.attack1_name = attack1_name
-        self.attack1_dmg = attack1_dmg
-        self.attack2_name = attack2_name
-        self.attack2_dmg = attack2_dmg
+from pokemon import Pokemon, PokemonManager
+
+class Animal(Pokemon):
+    def __init__(self, **args):
+
+        super().__init__(**args)
+        self.hp = self.HP
+        self.max_hp = self.HP
 
     def is_alive(self):
         return self.hp > 0
@@ -38,34 +37,39 @@ def display_status(player, computer):
 
 def player_turn(player, computer):
     print(f"{player.name}'s turn!")
-    print(f"Active animal: {player.active_animal.name}")
+    print(f"Active Pokemon: {player.active_animal.name}")
     print("Available actions:")
     print("1. Attack")
-    print("2. Swap animal")
+    print("2. Swap Pokemon")
     print("3. Forfeit")
     
     while True:
         choice = input("Choose an action (1-3): ").strip()
         if choice == "1":
-            print(f"Attacks: 1. {player.active_animal.attack1_name} ({player.active_animal.attack1_dmg} dmg)")
-            print(f"         2. {player.active_animal.attack2_name} ({player.active_animal.attack2_dmg} dmg)")
+            i = 1
+            choice_map = {}
+            for attack in player.active_animal.attacks:
+                if i == 1:
+                    print(f"Attacks: {i}. {attack} ({player.active_animal.attacks[attack]} dmg)")
+                else:
+                    print(f"         {i}. {attack} ({player.active_animal.attacks[attack]} dmg)")
+
+                choice_map[i] = attack
+
             attack_choice = input("Choose attack (1-2): ").strip()
-            if attack_choice == "1":
-                damage = computer.active_animal.take_damage(player.active_animal.attack1_dmg)
-                print(f"{player.active_animal.name} used {player.active_animal.attack1_name} and dealt {damage} damage!")
-                return True
-            elif attack_choice == "2":
-                damage = computer.active_animal.take_damage(player.active_animal.attack2_dmg)
-                print(f"{player.active_animal.name} used {player.active_animal.attack2_name} and dealt {damage} damage!")
+
+            if attack_choice in ["1", "2"]:
+                damage = computer.active_animal.take_damage(player.active_animal.attacks[choice_map[attack_choice]])
+                print(f"{player.active_animal.name} used {player.active_animal.attacks[choice_map[attack_choice]]} and dealt {damage} damage!")
                 return True
             else:
                 print("Invalid attack choice. Try again.")
         elif choice == "2":
-            print("Available animals:")
+            print("Available Pokemon:")
             for i, animal in enumerate(player.animals):
                 status = "Alive" if animal.is_alive() else "Fainted"
                 print(f"{i+1}. {animal.name} ({animal.hp}/{animal.max_hp} HP, {status})")
-            swap_choice = input("Choose animal to swap to (1-3, 0 to cancel): ").strip()
+            swap_choice = input("Choose Pokemon to swap to (1-3, 0 to cancel): ").strip()
             if swap_choice == "0":
                 continue
             try:
@@ -74,7 +78,7 @@ def player_turn(player, computer):
                     print(f"{player.name} swapped to {player.active_animal.name}!")
                     return True
                 else:
-                    print("Invalid choice or animal is fainted. Try again.")
+                    print("Invalid choice or Pokemon is fainted. Try again.")
             except ValueError:
                 print("Invalid input. Try again.")
         elif choice == "3":
@@ -87,14 +91,12 @@ def computer_turn(computer, player):
     print(f"Computer's turn!")
     # Computer prioritizes attack if active animal is strong, else swaps or attacks randomly
     available_animals = [i for i, animal in enumerate(computer.animals) if animal.is_alive() and animal != computer.active_animal]
-    if random.random() < 0.7 or not available_animals:  # 70% chance to attack
+    if random.random() < 0.6 or not available_animals:  # 60% chance to attack
         attack_choice = random.choice([1, 2])
-        if attack_choice == 1:
-            damage = player.active_animal.take_damage(computer.active_animal.attack1_dmg)
-            print(f"{computer.active_animal.name} used {computer.active_animal.attack1_name} and dealt {damage} damage!")
-        else:
-            damage = player.active_animal.take_damage(computer.active_animal.attack2_dmg)
-            print(f"{computer.active_animal.name} used {computer.active_animal.attack2_name} and dealt {damage} damage!")
+        akey = list(computer.active_animal.attacks.keys())[attack_choice]
+        damage = player.active_animal.take_damage(computer.active_animal.attacks[akey])
+        print(f"{computer.active_animal.name} used {akey} and dealt {damage} damage!")
+
     else:  # Swap to a random alive animal
         swap_index = random.choice(available_animals)
         computer.swap_animal(swap_index)
@@ -102,14 +104,35 @@ def computer_turn(computer, player):
     return True
 
 def main():
-    # Define animals
+    # Load Pokemon
+    manager = PokemonManager()
     animals = [
         Animal("Lion", 100, "Bite", 20, "Roar", 10),
         Animal("Eagle", 80, "Talon Strike", 15, "Screech", 12),
         Animal("Bear", 120, "Claw Swipe", 18, "Slam", 22)
     ]
     
-    player = Player("Player", [Animal(a.name, a.hp, a.attack1_name, a.attack1_dmg, a.attack2_name, a.attack2_dmg) for a in animals])
+    # player and computer take turns picking pokemon from common list
+    unselected = {p.name: p for p in manager.pokemon}
+    players_pokemon = []
+    computer_pokemon = []
+    choice_map = {}
+    while len(unselected) > 0:
+        # print out the remaining pokemon names to choose from
+        c = 1
+        for p in unselected:
+            print(f"  {c}. {p}\n")
+            choice_map[str(c)] = unselected[p]
+            c += 1
+
+        player_choice = input(f"Pick a Pokemon (1-{c}): ")
+        players_pokemon.append(unselected[choice_map[player_choice]])
+        del unselected[choice_map[player_choice]]
+
+        # computer selects a pokemon
+        pass
+        
+    player = Player("Player", manager.pokemon)
     computer = Player("Computer", [Animal(a.name, a.hp, a.attack1_name, a.attack1_dmg, a.attack2_name, a.attack2_dmg) for a in animals])
     
     print("Welcome to Animal Battle!")
