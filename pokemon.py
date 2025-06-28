@@ -13,6 +13,17 @@ class Pokemon:
     weakness: str
     resistance: str | None
 
+    def __post_init__(self, **args):
+        self.hp = self.HP
+        self.max_hp = self.HP
+
+    def is_alive(self):
+        return self.hp > 0
+
+    def take_damage(self, damage):
+        self.hp = max(0, int(self.hp) - int(damage))
+        return damage
+
 class PokemonManager:
     def __init__(self, filename: str = "pokemon.json"):
         self.filename = filename
