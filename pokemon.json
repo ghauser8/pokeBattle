@@ -1,0 +1,71 @@
+[
+  {
+    "name": "plipplop",
+    "type": "water",
+    "HP": 80,
+    "stage": 0,
+    "attacks": {
+      "water gun": "80"
+    },
+    "weakness": "",
+    "resistance": ""
+  },
+  {
+    "name": "gengar",
+    "type": "gost",
+    "HP": 150,
+    "stage": 2,
+    "attacks": {
+      "will o wisp": 190,
+      "night shade": 150
+    },
+    "weakness": "fiting",
+    "resistance": "water"
+  },
+  {
+    "name": "cinderace",
+    "type": "fire",
+    "HP": 170,
+    "stage": 2,
+    "attacks": {
+      "fireball shot": 150
+    },
+    "weakness": "water",
+    "resistance": ""
+  },
+  {
+    "name": "venomoth",
+    "type": "grass",
+    "HP": 90,
+    "stage": 1,
+    "attacks": {
+      "miracle powder": 30,
+      "gust": 70
+    },
+    "weakness": "fire",
+    "resistance": ""
+  },
+  {
+    "name": "articuno",
+    "type": "ice",
+    "HP": 110,
+    "stage": 0,
+    "attacks": {
+      "ice wing": 20,
+      "wild freeze": 70
+    },
+    "weakness": "metel ",
+    "resistance": ""
+  },
+  {
+    "name": "spectrier",
+    "type": "sykick",
+    "HP": 120,
+    "stage": 0,
+    "attacks": {
+      "": ""
+    },
+    "weakness": "",
+    "resistance": ""
+  }
+]
