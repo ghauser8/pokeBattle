@@ -7,9 +7,9 @@ from typing import List
 class Pokemon:
     name: str
     type: str
-    HP: int  # in meters
-    stage: int  # in kilograms
-    attacks: dict[str,int] # in years
+    HP: int  
+    stage: int  
+    attacks: dict[str,int] 
     weakness: str
     resistance: str | None
 
@@ -70,19 +70,23 @@ class PokemonManager:
         except ValueError:
             print("Invalid input. Height and weight must be numbers, age must be an integer.")
 
-    def view_pokemon(self):
+    def view_pokemon(self, namesOnly = False):
         if not self.pokemon:
             print("No pokemon in the database.")
             return
         for i, pokemon in enumerate(self.pokemon, 1):
-            print(f"\nPokemon {i}:")
-            print(f"  Name: {pokemon.name}")
-            print(f"  Type: {pokemon.type}")
-            print(f"  HP: {pokemon.HP}")
-            print(f"  Stage: {pokemon.stage}")
-            print(f"  Attacks: {pokemon.attacks}")
-            print(f"  Weakness: {pokemon.weakness}")
-            print(f"  Resistance: {pokemon.resistance}")
+            if namesOnly:
+                print(f"\nPokemon {i}:")
+
+            else:
+                print(f"\nPokemon {i}:")
+                print(f"  Name: {pokemon.name}")
+                print(f"  Type: {pokemon.type}")
+                print(f"  HP: {pokemon.HP}")
+                print(f"  Stage: {pokemon.stage}")
+                print(f"  Attacks: {pokemon.attacks}")
+                print(f"  Weakness: {pokemon.weakness}")
+                print(f"  Resistance: {pokemon.resistance}")
 
     def edit_pokemon(self):
         self.view_pokemon()
