@@ -41,12 +41,14 @@ def player_turn(player, computer):
                     print(f"         {i}. {attack} ({player.active_pokemon.attacks[attack]} dmg)")
 
                 choice_map[i] = attack
+                i += 1
 
-            attack_choice = input("Choose attack (1-2): ").strip()
+            attack_choice = input(f"Choose attack (1-{i-1}): ").strip()
 
             if attack_choice in ["1", "2"]:
                 damage = computer.active_pokemon.take_damage(player.active_pokemon.attacks[choice_map[int(attack_choice)]])
-                print(f"{player.active_pokemon.name} used {player.active_pokemon.attacks[choice_map[int(attack_choice)]]} and dealt {damage} damage!")
+                print(f"{player.active_pokemon.name} used {choice_map[int(attack_choice)]} and dealt {damage} damage!")
+                input("\t Enter to continue...")
                 return True
             else:
                 print("Invalid attack choice. Try again.")
@@ -55,7 +57,7 @@ def player_turn(player, computer):
             for i, pokemon in enumerate(player.pokemon):
                 status = "Alive" if pokemon.is_alive() else "Fainted"
                 print(f"{i+1}. {pokemon.name} ({pokemon.hp}/{pokemon.max_hp} HP, {status})")
-            swap_choice = input("Choose Pokemon to swap to (1-3, 0 to cancel): ").strip()
+            swap_choice = input(f"Choose Pokemon to swap to (1-{len(player.pokemon)}, 0 to cancel): ").strip()
             if swap_choice == "0":
                 continue
             try:
@@ -78,33 +80,36 @@ def computer_turn(computer, player):
     # Computer prioritizes attack if active pokemon is strong, else swaps or attacks randomly
     available_pokemon = [i for i, pokemon in enumerate(computer.pokemon) if pokemon.is_alive() and pokemon != computer.active_pokemon]
     if random.random() < 0.6 or not available_pokemon:  # 60% chance to attack
-        attack_choice = random.choice([1, 2])
+        attack_choice = random.choice([i for i in range(len(computer.active_pokemon.attacks.keys()))])
         akey = list(computer.active_pokemon.attacks.keys())[attack_choice]
         damage = player.active_pokemon.take_damage(computer.active_pokemon.attacks[akey])
         print(f"{computer.active_pokemon.name} used {akey} and dealt {damage} damage!")
+        input("\t Enter to continue...")
 
     else:  # Swap to a random alive pokemon
         swap_index = random.choice(available_pokemon)
         computer.swap_pokemon(swap_index)
         print(f"Computer swapped to {computer.active_pokemon.name}!")
+        input("\t Enter to continue...")
     return True
 
 def main():
     # Load Pokemon
     manager = PokemonManager()
-    # pokemon = [
-    #     Pokemon("Lion", 100, "Bite", 20, "Roar", 10,
-    #     pokemon("Eagle", 80, "Talon Strike", 15, "Screech", 12),
-    #     pokemon("Bear", 120, "Claw Swipe", 18, "Slam", 22)
-    # ]
+    pick_limit = 2
     
     # player and computer take turns picking pokemon from common list
+    print("Welcome to Pokemon Battle!")
+    print("Each Pokemon has two attacks and health points. Take turns to attack, swap, or forfeit.")
+    print("First, take turns selecting your Pokemon. Player goes first!")
+    input("\t Enter to continue...")
     unselected = {p.name: p for p in manager.pokemon}
     players_pokemon = []
     computer_pokemon = []
     choice_map = {}
-    while len(players_pokemon) < 2:
+    while len(players_pokemon) < pick_limit:
         # print out the remaining pokemon names to choose from
+        print(f"Select your next Pokemon. You have {pick_limit - len(players_pokemon)} of {pick_limit} selections left:")
         choice_map = {}
         c = 1
         for p in unselected:
@@ -114,7 +119,9 @@ def main():
 
         player_choice = input(f"Pick a Pokemon (1-{c-1}): ")
         players_pokemon.append(unselected[choice_map[player_choice]])
+        player_pick = choice_map[player_choice]
         del unselected[choice_map[player_choice]]
+        print(f"You picked {player_pick}!")
 
         # computer selects a pokemon
         choice_map = {
@@ -125,13 +132,14 @@ def main():
         else:
             computer_choice = 0
         computer_pokemon.append(unselected[choice_map[computer_choice]])
+        computer_pick = choice_map[computer_choice]
         del unselected[choice_map[computer_choice]]
+        print(f"Computer picked {computer_pick}!")
+        input("\t Enter to continue...")
         
     player = Player("Player", players_pokemon)
     computer = Player("Computer", computer_pokemon)
     
-    print("Welcome to Pokemon Battle!")
-    print("Each Pokemon has two attacks and health points. Take turns to attack, swap, or forfeit.")
     
     while player.has_alive_pokemon() and computer.has_alive_pokemon():
         display_status(player, computer)
@@ -143,6 +151,7 @@ def main():
             
         if not computer.active_pokemon.is_alive():
             print(f"Computer's {computer.active_pokemon.name} fainted!")
+            input("\t Enter to continue...")
             alive_pokemon = [i for i, pokemon in enumerate(computer.pokemon) if pokemon.is_alive()]
             if alive_pokemon:
                 computer.swap_pokemon(alive_pokemon[0])
@@ -160,6 +169,7 @@ def main():
         
         if not player.active_pokemon.is_alive():
             print(f"Player's {player.active_pokemon.name} fainted!")
+            input("\t Enter to continue...")
             alive_pokemon = [i for i, pokemon in enumerate(player.pokemon) if pokemon.is_alive()]
             if alive_pokemon:
                 print("Available Pokemon:")
