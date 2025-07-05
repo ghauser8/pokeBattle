@@ -18,6 +18,9 @@ class Player:
         return False
 
 def display_status(player, computer):
+    print("\n****************************")
+    print("******** New Round! ********")
+    print("****************************\n")
     print(f"\n{player.name}'s {player.active_pokemon.name}: {player.active_pokemon.hp}/{player.active_pokemon.max_hp} HP")
     print(f"Computer's {computer.active_pokemon.name}: {computer.active_pokemon.hp}/{computer.active_pokemon.max_hp} HP\n")
 
@@ -75,11 +78,11 @@ def player_turn(player, computer):
         else:
             print("Invalid choice. Try again.")
 
-def computer_turn(computer, player):
+def computer_turn(computer, player, difficulty=2):
     print(f"Computer's turn!")
     # Computer prioritizes attack if active pokemon is strong, else swaps or attacks randomly
     available_pokemon = [i for i, pokemon in enumerate(computer.pokemon) if pokemon.is_alive() and pokemon != computer.active_pokemon]
-    if random.random() < 0.6 or not available_pokemon:  # 60% chance to attack
+    if random.random() < 0.5 + 0.1 * difficulty or not available_pokemon:
         attack_choice = random.choice([i for i in range(len(computer.active_pokemon.attacks.keys()))])
         akey = list(computer.active_pokemon.attacks.keys())[attack_choice]
         damage = player.active_pokemon.take_damage(computer.active_pokemon.attacks[akey])
@@ -93,10 +96,12 @@ def computer_turn(computer, player):
         input("\t Enter to continue...")
     return True
 
-def main():
+def battle(settings = {}):
     # Load Pokemon
     manager = PokemonManager()
-    pick_limit = 2
+    if settings['pick_limit']:
+        pick_limit = settings['pick_limit']
+
     
     # player and computer take turns picking pokemon from common list
     print("Welcome to Pokemon Battle!")
@@ -146,7 +151,7 @@ def main():
         
         # Player's turn
         if not player_turn(player, computer):
-            print("Computer wins!")
+            print("Computer wins!\n")
             break
             
         if not computer.active_pokemon.is_alive():
@@ -157,15 +162,20 @@ def main():
                 computer.swap_pokemon(alive_pokemon[0])
                 print(f"Computer sent out {computer.active_pokemon.name}!")
             else:
-                print("Player wins!")
+                print("Player wins!\n")
+                print(ASCII_ART['player_wins'])
                 break
                 
         if not computer.has_alive_pokemon():
-            print("Player wins!")
+            print("Player wins!\n")
+            print(ASCII_ART['player_wins'])
             break
             
         # Computer's turn
-        computer_turn(computer, player)
+        if settings['difficulty']:
+            computer_turn(computer, player, settings['difficulty'])
+        else:
+            computer_turn(computer, player)
         
         if not player.active_pokemon.is_alive():
             print(f"Player's {player.active_pokemon.name} fainted!")
@@ -188,8 +198,99 @@ def main():
                     except ValueError:
                         print("Invalid input. Try again.")
             else:
-                print("Computer wins!")
+                print("Computer wins!\n")
                 break
+
+def check_int_choice(choice, allowable_inputs: list) -> bool:
+
+    try:
+        choice = int(choice)
+        if choice in allowable_inputs:
+            return True
+        return False
+    except:
+        return False
+
+def settings_menu() -> dict:
+    print("---- Settings ----")
+    pick_limit = input("How many Pokemon should each player start with? (1-3) ")
+    good_pick = check_int_choice(pick_limit, [i+1 for i in range(3)])
+    while not good_pick:
+        pick_limit = input("Try again. How many pokemon should each player start with? (1-3) ")
+        good_pick = check_int_choice(pick_limit, [i+1 for i in range(3)])
+
+    difficulty = input("How good should the computer be? (1-5, 1=easiest, 5=hardest) ")
+    good_difficulty = check_int_choice(difficulty, [1,2,3,4,5])
+    while not good_difficulty:
+        difficulty = input("Try again. How good should the coputer be? (1-5) ")
+        good_difficulty = check_int_choice(difficulty, [1,2,3,4,5])
+
+    print('Settings successfully changed!\n')
+    return {
+        'pick_limit': int(pick_limit),
+        'difficulty': int(difficulty)
+    }
+
+
+def main():
+    ''' outer menu for seleting battle or manager or settings change '''
+    manager = PokemonManager()
+    settings = None
+    print('\nWelcome to PokeBattle!')
+    while True:
+        print("\n+++++++++++++++++++++++++")
+        print("+++++++ Main Menu +++++++")
+        print("+++++++++++++++++++++++++\n")
+        print('What would you like to do?')
+        print('\t 1. Battle!')
+        print('\t 2. Manage Pokemon')
+        print('\t 3. Change settings')
+        print('\t 4. Quit')
+
+        menu_choice = input("Choose (1-4): ")
+        good_choice = check_int_choice(menu_choice, [1,2,3,4])
+        while not good_choice:
+            menu_choice = input("That didn't make sense. Choose (1-4): ")
+            good_choice = check_int_choice(menu_choice, [1,2,3,4])
+        
+        if not settings:
+            settings = {'pick_limit': 2, 'difficulty': 3}
+        match int(menu_choice):
+            case 1:
+                battle(settings)
+            case 2:
+                manager.run()
+            case 3:
+                settings = settings_menu()
+            case 4:
+                print('Goodbye!')
+                return
+    
+ASCII_ART = {
+    'player_wins': """__/\\\________/\\\_____________________________                  
+ _\///\\\____/\\\/______________________________                 
+  ___\///\\\/\\\/________________________________                
+   _____\///\\\/__________/\\\\\_____/\\\____/\\\_               
+    _______\/\\\_________/\\\///\\\__\/\\\___\/\\\_              
+     _______\/\\\________/\\\__\//\\\_\/\\\___\/\\\_             
+      _______\/\\\_______\//\\\__/\\\__\/\\\___\/\\\_            
+       _______\/\\\________\///\\\\\/___\//\\\\\\\\\__           
+        _______\///___________\/////______\/////////___          
+__/\\\______________/\\\_________________________/\\\____        
+ _\/\\\_____________\/\\\_______________________/\\\\\\\__       
+  _\/\\\_____________\/\\\__/\\\________________/\\\\\\\\\_      
+   _\//\\\____/\\\____/\\\__\///___/\\/\\\\\\___\//\\\\\\\__     
+    __\//\\\__/\\\\\__/\\\____/\\\_\/\\\////\\\___\//\\\\\___    
+     ___\//\\\/\\\/\\\/\\\____\/\\\_\/\\\__\//\\\___\//\\\____   
+      ____\//\\\\\\//\\\\\_____\/\\\_\/\\\___\/\\\____\///_____  
+       _____\//\\\__\//\\\______\/\\\_\/\\\___\/\\\_____/\\\____ 
+        ______\///____\///_______\///__\///____\///_____\///_____"""
+    }
 
 if __name__ == "__main__":
     main()
+
+
+
+
+

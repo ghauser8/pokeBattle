@@ -7,15 +7,15 @@ from typing import List
 class Pokemon:
     name: str
     type: str
-    HP: int  
+    health_points: int  
     stage: int  
     attacks: dict[str,int] 
     weakness: str
     resistance: str | None
 
     def __post_init__(self, **args):
-        self.hp = self.HP
-        self.max_hp = self.HP
+        self.hp = self.health_points
+        self.max_hp = self.health_points
 
     def is_alive(self):
         return self.hp > 0
@@ -34,17 +34,33 @@ class PokemonManager:
         if os.path.exists(self.filename):
             with open(self.filename, 'r') as f:
                 data = json.load(f)
-                self.pokemon = [Pokemon(**pokemon) for pokemon in data]
+                for pokemon in data:
+                    if all("" == key for key in pokemon['attacks']):
+                        continue
+                    self.pokemon.append(Pokemon(**pokemon)) 
 
     def save_pokemon(self):
         with open(self.filename, 'w') as f:
-            json.dump([vars(pokemon) for pokemon in self.pokemon], f, indent=2)
+            keepers = [
+                "name",
+                "type",
+                "health_points",
+                "stage",
+                "attacks",
+                "weakness",
+                "resistance"
+            ]
+            dump_list = [
+                {key: val for key, val in vars(pokemon).items() if key in keepers}
+                for pokemon in self.pokemon
+            ]
+            json.dump(dump_list, f, indent=2)
 
     def add_pokemon(self):
         try:
             name = input("Enter pokemon name: ").strip()
             pokemon_type = input("Enter pokemon type: ").strip()
-            HP = int(input("Enter HP: "))
+            health_points = int(input("Enter health_points: "))
             stage = int(input("Enter stage: "))
             attacking = True
             attacks = []
@@ -66,7 +82,7 @@ class PokemonManager:
             pokemon = Pokemon(
                 name, 
                 pokemon_type, 
-                HP, 
+                health_points, 
                 stage, 
                 {attack_name: attack_damage 
                     for attack_name, attack_damage in attacks},
@@ -93,7 +109,7 @@ class PokemonManager:
                 print(f"\nPokemon {i}:")
                 print(f"  Name: {pokemon.name}")
                 print(f"  Type: {pokemon.type}")
-                print(f"  HP: {pokemon.HP}")
+                print(f"  health_points: {pokemon.health_points}")
                 print(f"  Stage: {pokemon.stage}")
                 print(f"  Attacks: {pokemon.attacks}")
                 print(f"  Weakness: {pokemon.weakness}")
@@ -111,20 +127,21 @@ class PokemonManager:
                 
                 name = input(f"New name ({pokemon.name}): ").strip()
                 pokemon_type = input(f"New Type ({pokemon.type}): ").strip()
-                HP = input(f"New HP ({pokemon.HP}): ").strip()
+                health_points = input(f"New health_points ({pokemon.health_points}): ").strip()
                 stage = input(f"New stage ({pokemon.stage}): ").strip()
                 print(f"New Attacks: ")
                 updated_attacks = {}
                 for attack in pokemon.attacks:
                     attack_name = input(f"New attack name: ({attack}): ").strip()
                     attack_damage = input(f"New attack damage: ({attack}: {pokemon.attacks[attack]}): ")
-                    updated_attacks[attack_name] = attack_damage
+                    if attack_name and attack_damage:
+                        updated_attacks[attack_name] = attack_damage
                 weakness = input(f"New Weakness ({pokemon.weakness}): ").strip()
                 resistance = input(f"New Resistance ({pokemon.resistance}): ").strip()
 
                 pokemon.name = name if name else pokemon.name
                 pokemon.type = pokemon_type if pokemon_type else pokemon.type
-                pokemon.HP = int(HP) if HP else pokemon.HP
+                pokemon.health_points = int(health_points) if health_points else pokemon.health_points
                 pokemon.stage = int(stage) if stage else pokemon.stage
                 pokemon.attacks = updated_attacks if len(updated_attacks) > 0 else pokemon.attacks
                 pokemon.weakness = weakness if weakness else pokemon.weakness

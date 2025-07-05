@@ -2,7 +2,7 @@
   {
     "name": "plipplop",
     "type": "water",
-    "HP": 80,
+    "health_points": 80,
     "stage": 0,
     "attacks": {
       "water gun": "80"
@@ -13,7 +13,7 @@
   {
     "name": "gengar",
     "type": "gost",
-    "HP": 150,
+    "health_points": 150,
     "stage": 2,
     "attacks": {
       "will o wisp": 190,
@@ -25,7 +25,7 @@
   {
     "name": "cinderace",
     "type": "fire",
-    "HP": 170,
+    "health_points": 170,
     "stage": 2,
     "attacks": {
       "fireball shot": 150
@@ -36,7 +36,7 @@
   {
     "name": "venomoth",
     "type": "grass",
-    "HP": 90,
+    "health_points": 90,
     "stage": 1,
     "attacks": {
       "miracle powder": 30,
@@ -48,7 +48,7 @@
   {
     "name": "articuno",
     "type": "ice",
-    "HP": 110,
+    "health_points": 110,
     "stage": 0,
     "attacks": {
       "ice wing": 20,
@@ -60,7 +60,7 @@
   {
     "name": "spectrier",
     "type": "sykick",
-    "HP": 120,
+    "health_points": 120,
     "stage": 0,
     "attacks": {
       "": ""
