@@ -51,7 +51,7 @@ def player_turn(player, computer):
             if attack_choice in ["1", "2"]:
                 damage = computer.active_pokemon.take_damage(player.active_pokemon.attacks[choice_map[int(attack_choice)]])
                 print(f"{player.active_pokemon.name} used {choice_map[int(attack_choice)]} and dealt {damage} damage!")
-                input("\t Enter to continue...")
+                input("\t Enter to continue...\n")
                 return True
             else:
                 print("Invalid attack choice. Try again.")
@@ -87,13 +87,13 @@ def computer_turn(computer, player, difficulty=2):
         akey = list(computer.active_pokemon.attacks.keys())[attack_choice]
         damage = player.active_pokemon.take_damage(computer.active_pokemon.attacks[akey])
         print(f"{computer.active_pokemon.name} used {akey} and dealt {damage} damage!")
-        input("\t Enter to continue...")
+        input("\t Enter to continue...\n")
 
     else:  # Swap to a random alive pokemon
         swap_index = random.choice(available_pokemon)
         computer.swap_pokemon(swap_index)
         print(f"Computer swapped to {computer.active_pokemon.name}!")
-        input("\t Enter to continue...")
+        input("\t Enter to continue...\n")
     return True
 
 def battle(settings = {}):
@@ -107,7 +107,7 @@ def battle(settings = {}):
     print("Welcome to Pokemon Battle!")
     print("Each Pokemon has two attacks and health points. Take turns to attack, swap, or forfeit.")
     print("First, take turns selecting your Pokemon. Player goes first!")
-    input("\t Enter to continue...")
+    input("\t Enter to continue...\n")
     unselected = {p.name: p for p in manager.pokemon}
     players_pokemon = []
     computer_pokemon = []
@@ -140,7 +140,7 @@ def battle(settings = {}):
         computer_pick = choice_map[computer_choice]
         del unselected[choice_map[computer_choice]]
         print(f"Computer picked {computer_pick}!")
-        input("\t Enter to continue...")
+        input("\t Enter to continue...\n")
         
     player = Player("Player", players_pokemon)
     computer = Player("Computer", computer_pokemon)
@@ -152,11 +152,12 @@ def battle(settings = {}):
         # Player's turn
         if not player_turn(player, computer):
             print("Computer wins!\n")
+            print(ASCII_ART['computer_wins'])
             break
             
         if not computer.active_pokemon.is_alive():
             print(f"Computer's {computer.active_pokemon.name} fainted!")
-            input("\t Enter to continue...")
+            input("\t Enter to continue...\n")
             alive_pokemon = [i for i, pokemon in enumerate(computer.pokemon) if pokemon.is_alive()]
             if alive_pokemon:
                 computer.swap_pokemon(alive_pokemon[0])
@@ -179,7 +180,7 @@ def battle(settings = {}):
         
         if not player.active_pokemon.is_alive():
             print(f"Player's {player.active_pokemon.name} fainted!")
-            input("\t Enter to continue...")
+            input("\t Enter to continue...\n")
             alive_pokemon = [i for i, pokemon in enumerate(player.pokemon) if pokemon.is_alive()]
             if alive_pokemon:
                 print("Available Pokemon:")
@@ -199,6 +200,7 @@ def battle(settings = {}):
                         print("Invalid input. Try again.")
             else:
                 print("Computer wins!\n")
+                print(ASCII_ART['computer_wins'])
                 break
 
 def check_int_choice(choice, allowable_inputs: list) -> bool:
@@ -267,7 +269,9 @@ def main():
                 return
     
 ASCII_ART = {
-    'player_wins': """__/\\\________/\\\_____________________________                  
+    'player_wins': 
+r"""
+__/\\\________/\\\_____________________________                  
  _\///\\\____/\\\/______________________________                 
   ___\///\\\/\\\/________________________________                
    _____\///\\\/__________/\\\\\_____/\\\____/\\\_               
@@ -284,7 +288,15 @@ __/\\\______________/\\\_________________________/\\\____
      ___\//\\\/\\\/\\\/\\\____\/\\\_\/\\\__\//\\\___\//\\\____   
       ____\//\\\\\\//\\\\\_____\/\\\_\/\\\___\/\\\____\///_____  
        _____\//\\\__\//\\\______\/\\\_\/\\\___\/\\\_____/\\\____ 
-        ______\///____\///_______\///__\///____\///_____\///_____"""
+        ______\///____\///_______\///__\///____\///_____\///_____
+""",
+    'computer_wins':
+r"""
+ ____ ____ ____ ____ ____ ____ ____ ____ _________ ____ ____ ____ ____ 
+||C |||o |||m |||p |||u |||t |||e |||r |||       |||W |||i |||n |||s ||
+||__|||__|||__|||__|||__|||__|||__|||__|||_______|||__|||__|||__|||__||
+|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/_______\|/__\|/__\|/__\|/__\|
+"""
     }
 
 if __name__ == "__main__":
