@@ -157,6 +157,7 @@ def battle(settings = {}):
             
         if not computer.active_pokemon.is_alive():
             print(f"Computer's {computer.active_pokemon.name} fainted!")
+            print(ASCII_ART['fainted'])
             input("\t Enter to continue...\n")
             alive_pokemon = [i for i, pokemon in enumerate(computer.pokemon) if pokemon.is_alive()]
             if alive_pokemon:
@@ -180,6 +181,7 @@ def battle(settings = {}):
         
         if not player.active_pokemon.is_alive():
             print(f"Player's {player.active_pokemon.name} fainted!")
+            print(ASCII_ART['fainted'])
             input("\t Enter to continue...\n")
             alive_pokemon = [i for i, pokemon in enumerate(player.pokemon) if pokemon.is_alive()]
             if alive_pokemon:
@@ -296,6 +298,20 @@ r"""
 ||C |||o |||m |||p |||u |||t |||e |||r |||       |||W |||i |||n |||s ||
 ||__|||__|||__|||__|||__|||__|||__|||__|||_______|||__|||__|||__|||__||
 |/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/_______\|/__\|/__\|/__\|/__\|
+""",
+    'fainted':
+r"""
+     ___           ___                       ___           ___           ___           ___     
+    /\  \         /\  \          ___        /\__\         /\  \         /\  \         /\  \    
+   /::\  \       /::\  \        /\  \      /::|  |        \:\  \       /::\  \       /::\  \   
+  /:/\:\  \     /:/\:\  \       \:\  \    /:|:|  |         \:\  \     /:/\:\  \     /:/\:\  \  
+ /::\~\:\  \   /::\~\:\  \      /::\__\  /:/|:|  |__       /::\  \   /::\~\:\  \   /:/  \:\__\ 
+/:/\:\ \:\__\ /:/\:\ \:\__\  __/:/\/__/ /:/ |:| /\__\     /:/\:\__\ /:/\:\ \:\__\ /:/__/ \:|__|
+\/__\:\ \/__/ \/__\:\/:/  / /\/:/  /    \/__|:|/:/  /    /:/  \/__/ \:\~\:\ \/__/ \:\  \ /:/  /
+     \:\__\        \::/  /  \::/__/         |:/:/  /    /:/  /       \:\ \:\__\    \:\  /:/  / 
+      \/__/        /:/  /    \:\__\         |::/  /     \/__/         \:\ \/__/     \:\/:/  /  
+                  /:/  /      \/__/         /:/  /                     \:\__\        \::/__/   
+                  \/__/                     \/__/                       \/__/         ~~       
 """
     }
 
